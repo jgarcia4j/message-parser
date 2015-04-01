@@ -20,8 +20,7 @@ public class MessageContentParser {
     private static final Logger LOG = LoggerFactory.getLogger(MessageContentParser.class);
 
     public MessageContent parse(final String message) {
-        final MentionParser mentionParser = new MentionParser();
-        final List<String> mentions = mentionParser.parseMentions(message);
+        final List<String> mentions = new MentionParser().parse(message);
         final List<String> emoticons = new EmoticonParser().parse(message);
         final List<String> urls = new LinkParser().parse(message);
         final List<Link> links = new ArrayList<>(urls.size());

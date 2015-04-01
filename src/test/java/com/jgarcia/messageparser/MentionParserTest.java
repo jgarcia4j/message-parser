@@ -20,7 +20,7 @@ public class MentionParserTest {
     @Test
     public void testSingleMention() {
         final String message = "@here is relative to there, except when...";
-        final List<String> mentions = mentionParser.parseMentions(message);
+        final List<String> mentions = mentionParser.parse(message);
         assertThat(mentions.size(), is(1));
         assertThat(mentions.get(0), is("here"));
     }
@@ -28,7 +28,7 @@ public class MentionParserTest {
     @Test
     public void testMidSentenceMention() {
         final String message = "Yeah, if @you could put the cover sheet on your TPS reports, that'd be great.";
-        final List<String> mentions = mentionParser.parseMentions(message);
+        final List<String> mentions = mentionParser.parse(message);
         assertThat(mentions.size(), is(1));
         assertThat(mentions.get(0), is("you"));
     }
@@ -36,7 +36,7 @@ public class MentionParserTest {
     @Test
     public void testOnlyMention() {
         final String message = "@only";
-        final List<String> mentions = mentionParser.parseMentions(message);
+        final List<String> mentions = mentionParser.parse(message);
         assertThat(mentions.size(), is(1));
         assertThat(mentions.get(0), is("only"));
     }
@@ -44,13 +44,13 @@ public class MentionParserTest {
     @Test
     public void testMidWordMentionIgnored() {
         final String message = "You can't just m@ntion anywhere.";
-        assertThat(mentionParser.parseMentions(message).size(), is(0));
+        assertThat(mentionParser.parse(message).size(), is(0));
     }
 
     @Test
     public void testMentionBeforeNewLine() {
         final String message = " @ping \npong";
-        final List<String> mentions = mentionParser.parseMentions(message);
+        final List<String> mentions = mentionParser.parse(message);
         assertThat(mentions.size(), is(1));
         assertThat(mentions.get(0), is("ping"));
     }

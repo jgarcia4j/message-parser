@@ -18,7 +18,7 @@ public class MentionParser {
      */
     private static final Pattern MENTION_PATTERN = Pattern.compile("(^|\\W)@(?<mention>[\\S]+)");
 
-    public List<String> parseMentions(final String message) {
+    public List<String> parse(final String message) {
         final Matcher matcher = MENTION_PATTERN.matcher(message);
         final List<String> mentions = new ArrayList<>();
         while (matcher.find()) {
