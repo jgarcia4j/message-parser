@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -138,7 +139,7 @@ public class MessageContentParserTest {
     @Test
     public void testNoHostnameIgnored() {
         final String message = "Check out this cool site: http://";
-        assertThat(messageContentParser.parse(message).getLinks(), is(nullValue()));
+        assertThat(messageContentParser.parse(message).getLinks(), is(Collections.emptyList()));
     }
 
     @Test
@@ -187,7 +188,7 @@ public class MessageContentParserTest {
     @Test
     public void testMidWordMentionIgnored() {
         final String message = "You can't just m@ntion anywhere.";
-        assertThat(messageContentParser.parse(message).getMentions(), is(nullValue()));
+        assertThat(messageContentParser.parse(message).getMentions(), is(Collections.emptyList()));
     }
 
     @Test
@@ -301,7 +302,7 @@ public class MessageContentParserTest {
         final String keyword = "IAmRelativelySureThisStringIsMuchTooMuch";
         final String message = String.format(
                 "Emoticons are limited to 15 characters excluding the wrapping parenthesis. (%s)", keyword);
-        assertThat(messageContentParser.parse(message).getEmoticons(), is(nullValue()));
+        assertThat(messageContentParser.parse(message).getEmoticons(), is(Collections.emptyList()));
         verify(emoticonService, never()).findEmoticonByKeyword(eq(keyword));
     }
 
@@ -337,8 +338,8 @@ public class MessageContentParserTest {
         final User user = new User(1, "chris");
         when(userService.findUserByHandle(eq("chris"))).thenReturn(Optional.of(user));
         final MessageContent messageContent = messageContentParser.parse(message);
-        assertThat(messageContent.getEmoticons(), is(nullValue()));
-        assertThat(messageContent.getLinks(), is(nullValue()));
+        assertThat(messageContent.getEmoticons(), is(Collections.emptyList()));
+        assertThat(messageContent.getLinks(), is(Collections.emptyList()));
         final List<UserMention> userMentions = messageContent.getMentions();
         assertThat(userMentions.size(), is(1));
         final UserMention userMention = userMentions.get(0);
@@ -351,8 +352,8 @@ public class MessageContentParserTest {
         when(emoticonService.findEmoticonByKeyword(eq("megusta"))).thenReturn(Optional.of(generateImageUrl("megusta")));
         when(emoticonService.findEmoticonByKeyword(eq("coffee"))).thenReturn(Optional.of(generateImageUrl("coffee")));
         final MessageContent messageContent = messageContentParser.parse(message);
-        assertThat(messageContent.getMentions(), is(nullValue()));
-        assertThat(messageContent.getLinks(), is(nullValue()));
+        assertThat(messageContent.getMentions(), is(Collections.emptyList()));
+        assertThat(messageContent.getLinks(), is(Collections.emptyList()));
         final List<Emoticon> emoticons = messageContent.getEmoticons();
         assertThat(emoticons.size(), is(2));
         final Emoticon e1 = emoticons.get(0);
@@ -368,8 +369,8 @@ public class MessageContentParserTest {
         final String message = "Olympics are starting soon; http://www.nbcolympics.com";
         when(linkService.getDocumentTitle("http://www.nbcolympics.com")).thenReturn(Optional.of("NBC Olympics"));
         final MessageContent messageContent = messageContentParser.parse(message);
-        assertThat(messageContent.getEmoticons(), is(nullValue()));
-        assertThat(messageContent.getMentions(), is(nullValue()));
+        assertThat(messageContent.getEmoticons(), is(Collections.emptyList()));
+        assertThat(messageContent.getMentions(), is(Collections.emptyList()));
         assertThat(messageContent.getLinks().size(), is(1));
         assertThat(messageContent.getLinks().get(0).getUrl(), is("http://www.nbcolympics.com"));
         assertThat(messageContent.getLinks().get(0).getTitle(), is("NBC Olympics"));
