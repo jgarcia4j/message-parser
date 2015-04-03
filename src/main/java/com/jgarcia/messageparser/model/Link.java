@@ -1,5 +1,7 @@
 package com.jgarcia.messageparser.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.Objects;
 
 /**
@@ -20,6 +22,7 @@ public class Link {
     /**
      * The message tag used to identify the substring of the message to be wrapped in an anchor tag.
      */
+    @JsonIgnore
     private final MessageTag messageTag;
 
     public Link(final String url, final String title, final MessageTag messageTag) {
