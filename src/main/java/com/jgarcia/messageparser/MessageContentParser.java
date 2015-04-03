@@ -39,8 +39,10 @@ public class MessageContentParser {
         final List<UserMention> userMentions = new ArrayList<>();
         final List<Emoticon> emoticons = new ArrayList<>();
         final List<Link> links = new ArrayList<>();
+        // Tag important parts of message
         final List<MessageTag> tags = extractTags(message);
         for (final MessageTag tag : tags) {
+            // For each tag, fetch, validate, and store structured data to pass along to clients.
             switch (tag.getType()) {
                 case USER_MENTION:
                     final String handle = message.substring(tag.getStart() + 1, tag.getEnd()); // Remove prefix @ identifier.
@@ -56,6 +58,7 @@ public class MessageContentParser {
                     // Intentionally adding link despite the possible null title as the client
                     // should still treat the tag as a link.
                     links.add(new Link(url, linkService.getDocumentTitle(url).orElse(null), tag));
+                    // TODO: Truncate link to 50 characters and replace last three characters with "."? Reqs unclear.
                     break;
             }
         }

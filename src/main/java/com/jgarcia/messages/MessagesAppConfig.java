@@ -6,6 +6,9 @@ import org.glassfish.jersey.server.ResourceConfig;
 
 import javax.ws.rs.ApplicationPath;
 
+/**
+ * The web application configuration.
+ */
 @ApplicationPath("/")
 public class MessagesAppConfig extends ResourceConfig {
     public MessagesAppConfig() {

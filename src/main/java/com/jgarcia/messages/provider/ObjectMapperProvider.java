@@ -11,6 +11,10 @@ import com.jgarcia.messages.serializer.UserMentionJsonSerializer;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 
+/**
+ * Provides a singleton {@link ObjectMapper} for use by the Jersey framework.
+ * The {@code ObjectMapper} is responsible for mapping POJOs to/from JSON.
+ */
 @Provider
 public class ObjectMapperProvider implements ContextResolver<ObjectMapper> {
 

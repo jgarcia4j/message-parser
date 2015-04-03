@@ -11,6 +11,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.Optional;
 
+/**
+ * A web service that deals with chat messages.
+ */
 @Path("/messages")
 public class MessageService {
 
@@ -24,6 +27,12 @@ public class MessageService {
         );
     }
 
+    /**
+     * Returns structured {@link MessageContent} which was extracted from the given {@code message}.
+     *
+     * @param message the non-null message
+     * @return structured {@link MessageContent} which was extracted from the given {@code message}.
+     */
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public MessageContent post(final String message) {
