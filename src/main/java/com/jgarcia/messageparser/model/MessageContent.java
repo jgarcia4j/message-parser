@@ -11,7 +11,7 @@ public class MessageContent {
     /**
      * The list of users mentioned.
      */
-    private final List<String> mentions;
+    private final List<UserMention> mentions;
 
     /**
      * The list of custom emoticons.
@@ -23,13 +23,13 @@ public class MessageContent {
      */
     private final List<Link> links;
 
-    public MessageContent(final List<String> mentions, final List<String> emoticons, final List<Link> links) {
+    public MessageContent(final List<UserMention> mentions, final List<String> emoticons, final List<Link> links) {
         this.mentions = mentions;
         this.emoticons = emoticons;
         this.links = links;
     }
 
-    public List<String> getMentions() {
+    public List<UserMention> getMentions() {
         return mentions;
     }
 

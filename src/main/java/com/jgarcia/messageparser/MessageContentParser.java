@@ -1,9 +1,8 @@
 package com.jgarcia.messageparser;
 
-import com.jgarcia.messageparser.model.Link;
-import com.jgarcia.messageparser.model.MessageContent;
-import com.jgarcia.messageparser.model.MessageTag;
-import com.jgarcia.messageparser.model.MessageTagType;
+import com.jgarcia.messageparser.exception.UserException;
+import com.jgarcia.messageparser.model.*;
+import com.jgarcia.messageparser.service.UserService;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
@@ -12,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,15 +22,30 @@ public class MessageContentParser {
 
     private static final Logger LOG = LoggerFactory.getLogger(MessageContentParser.class);
 
+    private final UserService userService;
+
+    public MessageContentParser(final UserService userService) {
+        this.userService = userService;
+    }
+
     public MessageContent parse(final String message) {
-        final List<String> mentions = new ArrayList<>();
         final List<String> emoticons = new ArrayList<>();
         final List<String> urls = new ArrayList<>();
+        final List<UserMention> userMentions = new ArrayList<>();
         final List<MessageTag> tags = extractTags(message);
         for (final MessageTag tag : tags) {
             switch (tag.getType()) {
                 case USER_MENTION:
-                    mentions.add(message.substring(tag.getStart(), tag.getEnd()));
+                    final String handle = message.substring(tag.getStart(), tag.getEnd()); // Remove prefix @ identifier.
+                    final Optional<User> user;
+                    try {
+                        user = userService.findUserByHandle(handle);
+                        if (user.isPresent()) {
+                            userMentions.add(new UserMention(user.get(), tag));
+                        }
+                    } catch (UserException e) {
+                        LOG.warn("Unable to retrieve mentioned user, ignoring mention! handle={}", handle, e);
+                    }
                     break;
                 case EMOTICON:
                     emoticons.add(message.substring(tag.getStart(), tag.getEnd()));
@@ -52,7 +67,7 @@ public class MessageContentParser {
 
             links.add(new Link(url, title));
         }
-        return new MessageContent((mentions.isEmpty()) ? null : mentions, (emoticons.isEmpty()) ? null : emoticons, (links.isEmpty()) ? null : links);
+        return new MessageContent((userMentions.isEmpty()) ? null : userMentions, (emoticons.isEmpty()) ? null : emoticons, (links.isEmpty()) ? null : links);
     }
 
     private static List<MessageTag> extractTags(final String message) {
