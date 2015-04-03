@@ -44,42 +44,36 @@ public class MessageContentParser {
             switch (tag.getType()) {
                 case USER_MENTION:
                     final String handle = message.substring(tag.getStart() + 1, tag.getEnd()); // Remove prefix @ identifier.
-                    final Optional<User> user;
-                    try {
-                        user = userService.findUserByHandle(handle);
-                        if (user.isPresent()) {
-                            userMentions.add(new UserMention(user.get(), tag));
-                        } else {
-                            LOG.debug("Mentioned user does not exist, ignoring mention. handle={}", handle);
-                        }
-                    } catch (UserException e) {
-                        LOG.warn("Unable to retrieve mentioned user, ignoring mention! handle={}", handle, e);
-                    }
+                    getMentionedUser(handle).ifPresent(user -> userMentions.add(new UserMention(user, tag)));
                     break;
                 case EMOTICON:
                     final String keyword = message.substring(tag.getStart() + 1, tag.getEnd() - 1); // Remove () wrappers.
-                    final Optional<String> emoticonUrl = emoticonService.findEmoticonByKeyword(keyword);
-                    if (emoticonUrl.isPresent()) {
-                        emoticons.add(new Emoticon(keyword, emoticonUrl.get(), tag));
-                    } else {
-                        LOG.debug("Unable to find/retrieve emoticon: keyword={}", keyword);
-                    }
+                    getEmoticonImageUrl(keyword)
+                            .ifPresent(imageUrl -> emoticons.add(new Emoticon(keyword, imageUrl, tag)));
                     break;
                 case LINK:
                     final String url = message.substring(tag.getStart(), tag.getEnd());
-                    final Optional<String> title = linkService.getDocumentTitle(url);
                     // Intentionally adding link despite the possible null title as the client
                     // should still treat the tag as a link.
-                    links.add(new Link(url, title.orElse(null), tag));
+                    links.add(new Link(url, linkService.getDocumentTitle(url).orElse(null), tag));
                     break;
             }
         }
+        // Set empty lists as null so Jackson doesn't serialize the empty JSON array as "[]"
         return new MessageContent(
                 (userMentions.isEmpty()) ? null : userMentions,
                 (emoticons.isEmpty()) ? null : emoticons,
                 (links.isEmpty()) ? null : links);
     }
 
+    /**
+     * Returns the list of extracted {@link MessageTag}s which were parsed from the given {@code message}.
+     *
+     * @param message the non-null message
+     * @return the list of extracted {@link MessageTag}s which were parsed from the given {@code message}.
+     *         The extraction is accomplished by using regular expression pattern matching based on the
+     *         pattern defined for each {@link MessageTagType}.
+     */
     private static List<MessageTag> extractTags(final String message) {
         final List<MessageTag> tags = new ArrayList<>();
         for (final MessageTagType messageTagType : MessageTagType.values()) {
@@ -91,5 +85,26 @@ public class MessageContentParser {
             }
         }
         return tags;
+    }
+
+    private Optional<User> getMentionedUser(final String handle) {
+        User user = null;
+        try {
+            user = userService.findUserByHandle(handle).orElse(null);
+            if (user == null) {
+                LOG.debug("Mentioned user does not exist, ignoring mention. handle={}", handle);
+            }
+        } catch (UserException e) {
+            LOG.warn("Unable to retrieve mentioned user, ignoring mention! handle={}", handle, e);
+        }
+        return Optional.ofNullable(user);
+    }
+
+    private Optional<String> getEmoticonImageUrl(final String keyword) {
+        final Optional<String> imageUrl = emoticonService.findEmoticonByKeyword(keyword);
+        if (!imageUrl.isPresent()) {
+            LOG.debug("Unable to find/retrieve emoticon: keyword={}", keyword);
+        }
+        return imageUrl;
     }
 }
