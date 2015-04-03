@@ -41,6 +41,9 @@ public class User {
 
     @Override
     public String toString() {
-        return Objects.toString(this);
+        return "User{" +
+                "id=" + id +
+                ", handle='" + handle + '\'' +
+                '}';
     }
 }

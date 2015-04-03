@@ -43,7 +43,7 @@ public class MessageContentParser {
         for (final MessageTag tag : tags) {
             switch (tag.getType()) {
                 case USER_MENTION:
-                    final String handle = message.substring(tag.getStart(), tag.getEnd()); // Remove prefix @ identifier.
+                    final String handle = message.substring(tag.getStart() + 1, tag.getEnd()); // Remove prefix @ identifier.
                     final Optional<User> user;
                     try {
                         user = userService.findUserByHandle(handle);

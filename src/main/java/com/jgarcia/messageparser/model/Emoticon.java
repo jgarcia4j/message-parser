@@ -58,6 +58,10 @@ public class Emoticon {
 
     @Override
     public String toString() {
-        return Objects.toString(this);
+        return "Emoticon{" +
+                "keyword='" + keyword + '\'' +
+                ", imageUrl='" + imageUrl + '\'' +
+                ", messageTag=" + messageTag +
+                '}';
     }
 }

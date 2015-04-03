@@ -58,6 +58,10 @@ public class Link {
 
     @Override
     public String toString() {
-        return Objects.toString(this);
+        return "Link{" +
+                "url='" + url + '\'' +
+                ", title='" + title + '\'' +
+                ", messageTag=" + messageTag +
+                '}';
     }
 }

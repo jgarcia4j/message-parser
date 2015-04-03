@@ -47,6 +47,9 @@ public class UserMention {
 
     @Override
     public String toString() {
-        return Objects.toString(this);
+        return "UserMention{" +
+                "user=" + user +
+                ", tag=" + tag +
+                '}';
     }
 }

@@ -59,6 +59,10 @@ public class MessageContent {
 
     @Override
     public String toString() {
-        return Objects.toString(this);
+        return "MessageContent{" +
+                "mentions=" + mentions +
+                ", emoticons=" + emoticons +
+                ", links=" + links +
+                '}';
     }
 }
