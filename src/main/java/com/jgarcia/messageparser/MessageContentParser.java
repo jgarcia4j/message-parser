@@ -3,13 +3,11 @@ package com.jgarcia.messageparser;
 import com.jgarcia.messageparser.exception.UserException;
 import com.jgarcia.messageparser.model.*;
 import com.jgarcia.messageparser.service.EmoticonService;
+import com.jgarcia.messageparser.service.LinkService;
 import com.jgarcia.messageparser.service.UserService;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -27,15 +25,20 @@ public class MessageContentParser {
 
     private final EmoticonService emoticonService;
 
-    public MessageContentParser(final UserService userService, final EmoticonService emoticonService) {
+    private final LinkService linkService;
+
+    public MessageContentParser(final UserService userService,
+                                final EmoticonService emoticonService,
+                                final LinkService linkService) {
         this.userService = userService;
         this.emoticonService = emoticonService;
+        this.linkService = linkService;
     }
 
     public MessageContent parse(final String message) {
-        final List<String> urls = new ArrayList<>();
         final List<UserMention> userMentions = new ArrayList<>();
         final List<Emoticon> emoticons = new ArrayList<>();
+        final List<Link> links = new ArrayList<>();
         final List<MessageTag> tags = extractTags(message);
         for (final MessageTag tag : tags) {
             switch (tag.getType()) {
@@ -63,21 +66,13 @@ public class MessageContentParser {
                     }
                     break;
                 case LINK:
-                    urls.add(message.substring(tag.getStart(), tag.getEnd()));
+                    final String url = message.substring(tag.getStart(), tag.getEnd());
+                    final Optional<String> title = linkService.getDocumentTitle(url);
+                    // Intentionally adding link despite the possible null title as the client
+                    // should still treat the tag as a link.
+                    links.add(new Link(url, title.orElse(null), tag));
                     break;
             }
-        }
-        final List<Link> links = new ArrayList<>(urls.size());
-        for (final String url : urls) {
-            String title = null;
-            try {
-                final Document document = Jsoup.connect(url).get();
-                title = document.title();
-            } catch (IOException e) {
-                LOG.warn("Unable to get document title: url={}", url);
-            }
-
-            links.add(new Link(url, title));
         }
         return new MessageContent(
                 (userMentions.isEmpty()) ? null : userMentions,

@@ -17,9 +17,15 @@ public class Link {
      */
     private final String title;
 
-    public Link(final String url, final String title) {
+    /**
+     * The message tag used to identify the substring of the message to be wrapped in an anchor tag.
+     */
+    private final MessageTag messageTag;
+
+    public Link(final String url, final String title, final MessageTag messageTag) {
         this.url = url;
         this.title = title;
+        this.messageTag = messageTag;
     }
 
     public String getUrl() {
@@ -30,9 +36,13 @@ public class Link {
         return title;
     }
 
+    public MessageTag getMessageTag() {
+        return messageTag;
+    }
+
     @Override
     public int hashCode() {
-        return Objects.hash(url, title);
+        return Objects.hash(url, title, messageTag);
     }
 
     @Override
@@ -42,7 +52,8 @@ public class Link {
         }
         final Link that = (Link) obj;
         return Objects.equals(this.url, that.url)
-                && Objects.equals(this.title, that.title);
+                && Objects.equals(this.title, that.title)
+                && Objects.equals(this.messageTag, that.messageTag);
     }
 
     @Override
