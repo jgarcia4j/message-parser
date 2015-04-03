@@ -2,6 +2,7 @@ package com.jgarcia.messageparser;
 
 import com.jgarcia.messageparser.exception.UserException;
 import com.jgarcia.messageparser.model.*;
+import com.jgarcia.messageparser.service.EmoticonService;
 import com.jgarcia.messageparser.service.UserService;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -24,14 +25,17 @@ public class MessageContentParser {
 
     private final UserService userService;
 
-    public MessageContentParser(final UserService userService) {
+    private final EmoticonService emoticonService;
+
+    public MessageContentParser(final UserService userService, final EmoticonService emoticonService) {
         this.userService = userService;
+        this.emoticonService = emoticonService;
     }
 
     public MessageContent parse(final String message) {
-        final List<String> emoticons = new ArrayList<>();
         final List<String> urls = new ArrayList<>();
         final List<UserMention> userMentions = new ArrayList<>();
+        final List<Emoticon> emoticons = new ArrayList<>();
         final List<MessageTag> tags = extractTags(message);
         for (final MessageTag tag : tags) {
             switch (tag.getType()) {
@@ -42,13 +46,21 @@ public class MessageContentParser {
                         user = userService.findUserByHandle(handle);
                         if (user.isPresent()) {
                             userMentions.add(new UserMention(user.get(), tag));
+                        } else {
+                            LOG.debug("Mentioned user does not exist, ignoring mention. handle={}", handle);
                         }
                     } catch (UserException e) {
                         LOG.warn("Unable to retrieve mentioned user, ignoring mention! handle={}", handle, e);
                     }
                     break;
                 case EMOTICON:
-                    emoticons.add(message.substring(tag.getStart(), tag.getEnd()));
+                    final String keyword = message.substring(tag.getStart() + 1, tag.getEnd() - 1); // Remove () wrappers.
+                    final Optional<String> emoticonUrl = emoticonService.findEmoticonByKeyword(keyword);
+                    if (emoticonUrl.isPresent()) {
+                        emoticons.add(new Emoticon(keyword, emoticonUrl.get(), tag));
+                    } else {
+                        LOG.debug("Unable to find/retrieve emoticon: keyword={}", keyword);
+                    }
                     break;
                 case LINK:
                     urls.add(message.substring(tag.getStart(), tag.getEnd()));
@@ -67,7 +79,10 @@ public class MessageContentParser {
 
             links.add(new Link(url, title));
         }
-        return new MessageContent((userMentions.isEmpty()) ? null : userMentions, (emoticons.isEmpty()) ? null : emoticons, (links.isEmpty()) ? null : links);
+        return new MessageContent(
+                (userMentions.isEmpty()) ? null : userMentions,
+                (emoticons.isEmpty()) ? null : emoticons,
+                (links.isEmpty()) ? null : links);
     }
 
     private static List<MessageTag> extractTags(final String message) {

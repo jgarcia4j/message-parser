@@ -16,14 +16,14 @@ public class MessageContent {
     /**
      * The list of custom emoticons.
      */
-    private final List<String> emoticons;
+    private final List<Emoticon> emoticons;
 
     /**
      * The list of links.
      */
     private final List<Link> links;
 
-    public MessageContent(final List<UserMention> mentions, final List<String> emoticons, final List<Link> links) {
+    public MessageContent(final List<UserMention> mentions, final List<Emoticon> emoticons, final List<Link> links) {
         this.mentions = mentions;
         this.emoticons = emoticons;
         this.links = links;
@@ -33,7 +33,7 @@ public class MessageContent {
         return mentions;
     }
 
-    public List<String> getEmoticons() {
+    public List<Emoticon> getEmoticons() {
         return emoticons;
     }
 
