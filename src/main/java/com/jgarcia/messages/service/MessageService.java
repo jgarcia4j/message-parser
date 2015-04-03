@@ -26,7 +26,7 @@ public class MessageService {
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public MessageContent addMessage(final String message) {
+    public MessageContent post(final String message) {
         return messageContentParser.parse(message);
     }
 }
