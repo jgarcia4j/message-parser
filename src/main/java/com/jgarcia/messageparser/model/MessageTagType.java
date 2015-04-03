@@ -17,7 +17,7 @@ public enum MessageTagType {
      *
      * Note: I am assuming that emoticons cannot contain parentheses within the wrapping parentheses.
      */
-    EMOTICON(Pattern.compile(String.format("(?<emoticon>\\([^()]{1,%d}\\))"), EmoticonConst.MAX_LENGTH), "emoticon"),
+    EMOTICON(Pattern.compile(String.format("(?<emoticon>\\([^()]{1,%d}\\))", EmoticonConst.MAX_LENGTH)), "emoticon"),
     /**
      * A link/url. Denoted by the "http://" or "https://" protocol prefix.
      */
