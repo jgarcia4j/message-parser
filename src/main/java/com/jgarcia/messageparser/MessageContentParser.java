@@ -59,11 +59,7 @@ public class MessageContentParser {
                     break;
             }
         }
-        // Set empty lists as null so Jackson doesn't serialize the empty JSON array as "[]"
-        return new MessageContent(
-                (userMentions.isEmpty()) ? null : userMentions,
-                (emoticons.isEmpty()) ? null : emoticons,
-                (links.isEmpty()) ? null : links);
+        return new MessageContent(userMentions, emoticons, links);
     }
 
     /**

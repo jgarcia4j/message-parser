@@ -53,6 +53,13 @@
             <artifactId>jsoup</artifactId>
             <version>1.7.2</version>
         </dependency>
+        <!-- Jersey Test Framework. Used to verify that the response body is as expected for the given input/output values. -->
+        <dependency>
+            <groupId>org.glassfish.jersey.test-framework.providers</groupId>
+            <artifactId>jersey-test-framework-provider-jetty</artifactId>
+            <version>2.17</version>
+            <scope>test</scope>
+        </dependency>
         <!-- Fluently readable matchers used in unit tests. -->
         <dependency>
             <groupId>org.hamcrest</groupId>
