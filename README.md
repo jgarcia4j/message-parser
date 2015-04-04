@@ -7,7 +7,7 @@ Text-based communication services must reason about message content to optimize 
 
 To support these features, we must parse the user's input using the following guidelines:
 * Mentions
-  * Denoted by an "@" symbol directly proceeding the targeted user or group's **handle**
+  * Denoted by an "@" symbol directly preceding the targeted user or group's **handle**
   * Consist of a single _word_, where _word_ is defined as a sequence of non-whitespace characters.
   * **Examples:** @john, @emily, @all, @here
 * Links
